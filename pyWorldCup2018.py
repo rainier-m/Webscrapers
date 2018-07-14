@@ -187,8 +187,7 @@ def teamInsert(container):
         results = cursor.fetchone()
         # print (results)
         if results == None:
-            cursor.execute("INSERT INTO teams (team_short_id, team_long_name, team_badge, team_URL, team_active_ind, team_updated) "
-                           "VALUES (%s, %s, %s, %s, 1, date(%s))", (rowAbbr, rowTitle, imgName, urlLink, ds))
+            cursor.execute("INSERT INTO teams (team_short_id, team_long_name, team_badge, team_URL, team_active_ind, team_updated) VALUES (%s, %s, %s, %s, 1, date(%s))", (rowAbbr, rowTitle, imgName, urlLink, ds))
             cnx.commit()
             print (rowAbbr, rowTitle)
 
@@ -385,8 +384,7 @@ def postRoster (x, y, z):
         cursor.execute(playerSelect)
         results = cursor.fetchone()
         if results == None:
-            playerInsert = "INSERT INTO players (player_team_ID, player_givenName, player_clubName, player_Pos) VALUES (%d, '%s', '%s', '%s')" \
-                           % (countryID, givenName, clubName, pos)
+            playerInsert = "INSERT INTO players (player_team_ID, player_givenName, player_clubName, player_Pos) VALUES (%d, '%s', '%s', '%s')" % (countryID, givenName, clubName, pos)
             cursor.execute(playerInsert)
             cnx.commit()
 
