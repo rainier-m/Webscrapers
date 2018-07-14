@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/Webscrapers.iml" filepath="$PROJECT_DIR$/.idea/Webscrapers.iml" />
+      <module fileurl="file://G:/GitHub/xmlsoccer/xmlsoccer/.idea/xmlsoccer.iml" filepath="G:/GitHub/xmlsoccer/xmlsoccer/.idea/xmlsoccer.iml" />
+    </modules>
+  </component>
+</project>
