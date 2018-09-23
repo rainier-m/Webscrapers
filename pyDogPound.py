@@ -60,7 +60,7 @@ cnx = mysql.connector.connect(user='root', password='password',
 # Setup default web URLs for scraping
 baseDogPound = 'http://petharbor.com/results.asp?searchtype=ADOPT&start=3&friends=0&samaritans=0&nosuccess=0&rows=25&imght=300&imgres=detail&tWidth=200&view=sysadm.v_miad&text=000000&fontface=arial&fontsize=10&col_bg=99b5c9&col_bg2=e7eec4&SBG=026BA9&zip=33183&miles=10&shelterlist=%27MIAD%27&atype=&where=type_'
 pageNo = 1
-maxPageNo = 16
+maxPageNo = 99
 getDogs = 'DOG&'
 getCats = 'CAT&'
 basePageNo = 'PAGE=1'
@@ -69,7 +69,8 @@ baseURL = 'http://petharbor.com/'
 
 # Base Path for Output
 localPath = 'D:\\DogPound\\'
-localimgPath = 'D:\\DogPound\\img\\'
+# localimgPath = 'D:\\DogPound\\img\\'
+localimgPath = 'D:\\xampp\\htdocs\\furever\\img\\pets\\'
 
 # Download Images from a passed image URL, give a local filename + extension
 def downloadImage(imageURL, localFileName):
@@ -116,8 +117,8 @@ def parsePetRow (x, y):
     poundDate = (year + '-' + month + '-' + day)
 
     # Get Pet Description
-    petFullDesc = petDesc.get_text().replace('/', ' ')
-    petFullDesc = petFullDesc.replace('-', ' ')
+    petFullDesc = petDesc.get_text().replace('/', '')
+    petFullDesc = petFullDesc.replace('-', '')
     petFullDesc = petFullDesc.replace('(Parson) ', '')
     # print (petFullDesc)
 
@@ -140,8 +141,12 @@ def parsePetRow (x, y):
                   'Terrier', 'Cocker Spaniel', 'Schnauzer', 'Siberian Husky', 'Shiba Inu', 'Dogo Argentino', 'Yorkshire Terrier', 'Boston Terrier',
                   'Dutch Sheepdog', 'Bull Terrier', 'Newfoundland', 'Black Mouth Cur', 'Brasileiro', 'Belgian Malinois', 'Domestic Shorthair',
                   'Domestic Mediumhair', 'Siamese', 'Domestic Longhair','Alaskan Husky','Doberman Pinscher', 'Havanese', 'Pomeranian',
-                  'Rat Terrier', 'Lhasa Apso', 'English Bulldog', 'Flat Coated Retriever', 'Papillon', 'Basenji', 'Akita',
-                  'American Eskimo', 'Bichon Frise', 'Jack Russell Terrier', 'Border Collie']
+                  'Rat Terrier', 'Lhasa Apso', 'English Bulldog', 'Flat Coated Retriever', 'Papillon', 'Basenji', 'Akita', 'Pug',
+                  'American Eskimo', 'Bichon Frise', 'Jack Russell Terrier', 'Border Collie','Whippet', 'Cairn Terrier', 'Pekingese',
+                  'Grand Basset Griffon Vendeen', 'Coonhound', 'Basset Hound', 'Bombay', 'Australian Cattle Dog', 'Scottish Fold',
+                  'German Pinscher', 'Dutch Shepherd', 'Catahoula Leopard Hound', 'FlatCoated Retriever', 'Bearded Collie', 'St Bernard',
+                  'Brussels Griffon', 'Shetland Sheepdog', 'Alaskan Malamute', 'Corgi', 'Welsh Corgi    ', 'Cane Corso', 'Vizsla', 'Dutch Sheepdog']
+
 
     foundBreeds = []
     countBreed = 0
@@ -157,15 +162,18 @@ def parsePetRow (x, y):
     breedRegex = re.compile(r"((mix)|"
                             r"(((Maltese)|(Miniature Pinscher)|(Chihuahua)|(Poodle)|(Shih Tzu)|(Dachshund)|(Weimaraner)|(Alaskan Husky))|"
                             r"((Boxer)|(American Bulldog)|(Bulldog)|(Mastiff)|(Presa Canario)|(Australian Kelpie)|(Flat Coated Retriever))|"
-                            r"((Beagle)|(Golden Retriever)|(Labrador Retriever)|(German Shepherd)|(Australian Shepherd)|"
-                            r" (Plott Hound)|(Rottweiler)|(Pointer)|(English Shepherd)|(Tosa)|(Chinese Sharpei)|(Chow Chow))|"
+                            r"((Beagle)|(Golden Retriever)|(Labrador Retriever)|(Coonhound)|(German Shepherd)|(Australian Shepherd)|"
+                            r" (Plott Hound)|(Rottweiler)|(Pointer)|(English Shepherd)|(Tosa)|(Chinese Sharpei)|(Bombay)|(Chow Chow))|"
                             r"((Welsh Springer Spaniel)|(Terrier)|(Schnauzer)|(Cocker Spaniel)|(Spaniel)|(Siberian Husky)|(Shiba Inu))|"
                             r" (Dogo Argentino)|(Yorkshire Terrier)|(Pitt Bull Terrier)|(English Bulldog)|(Boston Terrier)"
                             r" (Dutch Sheepdog)|(Bull Terrier)|(Newfoundland)|(Black Mouth Cur)|(Brasileiro)|(Belgian Malinois)|"
                             r" (Doberman Pinscher)|(Havanese)|(Alaskan Husky)|(Pomeranian)|(Rat Terrier)|(Lhasa Apso)|(Papillon)|"
                             r" (Flat Coated Retriever)|(Basenji)|(Akita)|(American Eskimo)|(Bichon Frise)|(Border Collie)|"
-                            r" (Jack Russell Terrier))|"
-                            r"((Domestic Shorthair)|(Domestic Mediumhair)|(Siamese)|(Domestic Longhair)))")
+                            r" (Jack Russell Terrier)|(Basset Hound)|(Cairn Terrier)|(Pekingese)|(Grand Basset Griffon Vendeen))|"
+                            r"((Domestic Shorthair)|(Domestic Mediumhair)|(Siamese)|(Domestic Longhair)|(Whippet)|(Pug)|"
+                            r"(Australian Cattle Dog)|(Scottish Fold)|(German Pinscher)|(Dutch Shepherd)|(Bearded Collie)|"
+                            r"(FlatCoated Retriever)|(Catahoula Leopard Hound)|(St Bernard)|(Brussels Griffon)|(Shetland Sheepdog)|"
+                            r"(Alaskan Malamute)|(Corgi)|(Cane Corso)|(Welsh Corgi)|(Vizsla)|(Dutch Sheepdog)))")
     breedType = breedRegex.search(breed)
     breedDesc = "Unknown"
     mixRegex = re.compile(r"(mix)")
@@ -347,8 +355,10 @@ def parsePetRow (x, y):
     # Stub out an Elif for updating inactive Rows
     else:
         updatePetSQL = "UPDATE pets SET petModifiedDate = '%s', petAge = %d, petWeight = %d, petBreed = '%s', petIntact = '%s', " \
-                       "petCircumstance = '%s', petAvailable = '%s', petBreedDesc = '%s', petBreedMix = %d, petColoring = '%s' WHERE petCaseNo = '%s'" \
+                       "petCircumstance = '%s', petAvailable = '%s', petBreedDesc = '%s', petBreedMix = %d, petColoring = '%s', petActiveInd = 1" \
+                       " WHERE petCaseNo = '%s'" \
                        % (ds, age, wgt, desc, intact, circumstance, petStatus, breedDesc, petBreedMix, petColor, petId)
+        # print (breedDesc)
         cursor.execute(updatePetSQL)
         cnx.commit()
 
@@ -367,6 +377,8 @@ def parsePetRow (x, y):
         elif i == 'Boston Terrier':
             foundBreeds.remove('Terrier')
         elif i == 'Jack Russell Terrier':
+            foundBreeds.remove('Terrier')
+        elif i == 'Cairn Terrier':
             foundBreeds.remove('Terrier')
 
 
