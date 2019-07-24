@@ -145,7 +145,9 @@ def parsePetRow (x, y):
                   'American Eskimo', 'Bichon Frise', 'Jack Russell Terrier', 'Border Collie','Whippet', 'Cairn Terrier', 'Pekingese',
                   'Grand Basset Griffon Vendeen', 'Coonhound', 'Basset Hound', 'Bombay', 'Australian Cattle Dog', 'Scottish Fold',
                   'German Pinscher', 'Dutch Shepherd', 'Catahoula Leopard Hound', 'FlatCoated Retriever', 'Bearded Collie', 'St Bernard',
-                  'Brussels Griffon', 'Shetland Sheepdog', 'Alaskan Malamute', 'Corgi', 'Welsh Corgi    ', 'Cane Corso', 'Vizsla', 'Dutch Sheepdog']
+                  'Brussels Griffon', 'Shetland Sheepdog', 'Alaskan Malamute', 'Corgi', 'Welsh Corgi    ', 'Cane Corso', 'Vizsla', 'Dutch Sheepdog',
+                  'Hound', 'Bernese Mountain Dog', 'English Foxhound', 'American Shorthair', 'Russian Blue','Maine Coon','Great Dane',
+                  'Bloodhound','Dalmatian','Rhodesian Ridgeback','Great Dane','Sheepdog']
 
 
     foundBreeds = []
@@ -159,7 +161,7 @@ def parsePetRow (x, y):
             # print (toFind)
 
     print (breed)
-    breedRegex = re.compile(r"((mix)|"
+    breedRegex0 = re.compile(r"("
                             r"(((Maltese)|(Miniature Pinscher)|(Chihuahua)|(Poodle)|(Shih Tzu)|(Dachshund)|(Weimaraner)|(Alaskan Husky))|"
                             r"((Boxer)|(American Bulldog)|(Bulldog)|(Mastiff)|(Presa Canario)|(Australian Kelpie)|(Flat Coated Retriever))|"
                             r"((Beagle)|(Golden Retriever)|(Labrador Retriever)|(Coonhound)|(German Shepherd)|(Australian Shepherd)|"
@@ -173,8 +175,10 @@ def parsePetRow (x, y):
                             r"((Domestic Shorthair)|(Domestic Mediumhair)|(Siamese)|(Domestic Longhair)|(Whippet)|(Pug)|"
                             r"(Australian Cattle Dog)|(Scottish Fold)|(German Pinscher)|(Dutch Shepherd)|(Bearded Collie)|"
                             r"(FlatCoated Retriever)|(Catahoula Leopard Hound)|(St Bernard)|(Brussels Griffon)|(Shetland Sheepdog)|"
-                            r"(Alaskan Malamute)|(Corgi)|(Cane Corso)|(Welsh Corgi)|(Vizsla)|(Dutch Sheepdog)))")
-    breedType = breedRegex.search(breed)
+                            r"(Alaskan Malamute)|(Corgi)|(Cane Corso)|(Welsh Corgi)|(Vizsla)|(Dutch Sheepdog)|(Hound)|(Bernese Mountain Dog)|"
+                            r"(English Foxhound)|(American Shorthair)|(Russian Blue)))")
+    breedRegex1 = re.compile(r"((Maine Coon)|(Great Dane)|(Bloodhound)|(Dalmatian)|(Rhodesian Ridgeback)|(Great Dane)|(Sheepdog))")
+    breedType = breedRegex0.search(breed)
     breedDesc = "Unknown"
     mixRegex = re.compile(r"(mix)")
     mixSearch = mixRegex.search(breed)
@@ -408,7 +412,7 @@ petIds = []
 while counter <= maxPageNo:
     # Parse each Page
     newURL = baseDogPound + getDogs + pageTxt + str(counter)
-    # print (newURL)
+    print (newURL)
     petsAvailable = requests.get(newURL)
     petsAvailable.raise_for_status()
     petSoup = bs4.BeautifulSoup(petsAvailable.text, "html5lib")
