@@ -18,11 +18,14 @@ import random
 import html
 import os
 import openpyxl
+import sys
 
 # Establish the process Date & Time Stamp
 ts = datetime.datetime.now().strftime("%H%M%S")
 ds = datetime.datetime.now().strftime("%Y-%m-%d")
 date = datetime.datetime.now().strftime("%Y%m%d")
+
+print('Python Version :: ' + sys.version)
 
 # Output Dividers
 hr = " >>> *** ====================================================== *** <<<"
@@ -33,6 +36,10 @@ def updateTS():
    update = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
    return update
 
+# Base Path for Output
+localPath = 'F://Projects//Python//'
+
+# Sub Details
 subType = ['Bourbon Ridge Ham', 'Turkey', 'Ultimate', 'Italian', 'Chicken Tender', 'Roast Beef', 'Havana Bold', 'Chicken Cordon Bleu',
           'Ham', 'Deluxe', 'Philly Cheese', 'American', 'Rueben - Corned Beef', 'Maple Honey Turkey', 'EverRoast', 'Jerk Turkey',
           'Veggie', 'Tuna Salad', 'Egg Salad', 'Cuban Sub', 'Mojo Pork', 'Ham & Turkey', 'Chicken Salad', 'Beef Meatball']
@@ -50,7 +57,7 @@ subs = []
 
 possibleSubs = {}
 
-while counter <= 1000:
+while counter <= 10:
    randSub = random.choice(subType)
    randBread = random.choice(bread)
    randCheese = random.choice(cheese)

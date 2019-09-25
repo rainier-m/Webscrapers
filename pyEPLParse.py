@@ -40,7 +40,7 @@ sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
 
 # Establish MySQL Connection
 cnx = mysql.connector.connect(user='root', password='password',
-                              host='127.0.0.1',
+                              host='mjolnir',
                               database='fanfootball',
                               use_pure=False)
 
@@ -66,7 +66,7 @@ print(hr)
 
 # URLs to parse
 bbcBase = 'http://www.bbc.com/sport/football/premier-league/scores-fixtures/'
-seasonStart = '2017-08'
+seasonStart = '2019-08'
 
 # Base Path for Output
 localPath = 'D:\\Projects\\epl\\'

@@ -71,14 +71,15 @@ print(ds + ' :: ' + ts + ' :: ' + parseVersion)
 print('Python Version :: ' + sys.version)
 print(hr)
 
+
 # Define URLs for the Barclay's Premier League
 injuriesURL = 'http://www.fantasyfootballscout.co.uk/fantasy-football-injuries/'
 teamNewsURL = 'http://www.fantasyfootballscout.co.uk/team-news/'
-seasonID = 3
+seasonID = 4
 
 # Base Path for Output
-localPath = 'D:\\ESPN-Parser\\'
-localimgPath = 'D:\\ESPN-Parser\\img\\players\\'
+localPath = 'F:\\ESPN-Parser\\'
+localimgPath = 'F:\\ESPN-Parser\\img\\players\\'
 # baseWkBk = 'stats_template.xlsx'
 # workBook = openpyxl.load_workbook(os.path.join(localPath + baseWkBk))
 # teamSheet = workBook.get_sheet_by_name('teams')
@@ -260,6 +261,9 @@ for i in newsRows:
         cnx.commit()
         print('Row added for %s and he is %s .' % (playerName, playerStatus))
     else:
+        cursor.execute("UPDATE stg_player_news SET player_news_status = 1, player_rowadded = %s "
+                       "WHERE player_firstname = %s AND player_name = %s AND player_team = %s ", (updateTS(), playerFirstName, playerName, playerTeam))
+        cnx.commit()
         print('Row exists for %s and he is %s.' % (playerName, playerStatus))
 
         # print (counter)
