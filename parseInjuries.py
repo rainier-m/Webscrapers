@@ -33,6 +33,7 @@ import mysql.connector
 print('System Encoding:', sys.stdout.encoding)
 sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
 
+
 # Establish MySQL Connection
 cnx = mysql.connector.connect(user='root', password='password',
                               host='127.0.0.1',
@@ -71,7 +72,6 @@ print(ds + ' :: ' + ts + ' :: ' + parseVersion)
 print('Python Version :: ' + sys.version)
 print(hr)
 
-
 # Define URLs for the Barclay's Premier League
 injuriesURL = 'http://www.fantasyfootballscout.co.uk/fantasy-football-injuries/'
 teamNewsURL = 'http://www.fantasyfootballscout.co.uk/team-news/'
@@ -87,14 +87,15 @@ localimgPath = 'F:\\ESPN-Parser\\img\\players\\'
 # matchSheet = workBook.get_sheet_by_name('matches')
 # fixtureSheet = workBook.get_sheet_by_name('fixtures')
 # newsSheet = workBook.get_sheet_by_name('news')
+print (os.getcwd())
 
 # Create BS4 Object from Injuries Web Page
 injuryRes = requests.get(injuriesURL)
 injuryRes.raise_for_status()
 injurySoup = bs4.BeautifulSoup(injuryRes.text, "html.parser")
-with open(os.path.join(localPath + ds + '-injuryLanding.txt'), 'wb') as fo:
-    for chunk in injuryRes.iter_content(100000):
-        fo.write(chunk)
+#with open(os.path.join(localPath + ds + '-injuryLanding.txt'), 'wb') as fo:
+#    for chunk in injuryRes.iter_content(100000):
+#        fo.write(chunk)
 
 
 # Output Injury HTML Page.
@@ -255,7 +256,7 @@ for i in newsRows:
 
     if results == None:
         cursor.execute(
-            "INSERT INTO stg_player_news (player_firstname, player_name, player_team, player_status, player_returndate, player_news, player_newsURL, player_updatedate, player_rowadded, player_news_status, seasonID, player_imgID) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            "INSERT INTO stg_player_news (player_firstname, player_name, player_team, player_status, player_returndate, player_news, player_newsURL, player_updateddate, player_rowadded, player_news_status, seasonID, player_imgID) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
             (playerFirstName, playerName, playerTeam, playerStatus, returnDate, playerNews, newsURL, newsUpdated,
              updateTS(), '1', seasonID, playerImageID))
         cnx.commit()

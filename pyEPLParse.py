@@ -66,7 +66,7 @@ print(hr)
 
 # URLs to parse
 bbcBase = 'http://www.bbc.com/sport/football/premier-league/scores-fixtures/'
-seasonStart = '2019-08'
+seasonStart = '2019-20'
 
 # Base Path for Output
 localPath = 'D:\\Projects\\epl\\'

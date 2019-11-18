@@ -17,7 +17,7 @@ import datetime
 import random
 import html
 import os
-import openpyxl
+#import openpyxl
 import sys
 
 # Establish the process Date & Time Stamp
@@ -57,7 +57,7 @@ subs = []
 
 possibleSubs = {}
 
-while counter <= 10:
+while counter <= 1001:
    randSub = random.choice(subType)
    randBread = random.choice(bread)
    randCheese = random.choice(cheese)
