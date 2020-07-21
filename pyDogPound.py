@@ -24,7 +24,7 @@ import os
 import sys
 import codecs
 import mysql.connector
-from PIL import Image
+#from PIL import Image
 import time
 
 # Set Character Output

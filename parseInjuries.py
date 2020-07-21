@@ -35,10 +35,10 @@ sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
 
 
 # Establish MySQL Connection
-cnx = mysql.connector.connect(user='root', password='password',
-                              host='127.0.0.1',
+cnx = mysql.connector.connect(user='user', password='password',
+                              host='mjolnir',
                               database='fanfootball',
-                              use_pure=False)
+                              auth_plugin='mysql_native_password')
 
 # Establish the process Date & Time Stamp
 ts = datetime.datetime.now().strftime("%H:%M:%S")
@@ -168,6 +168,10 @@ def returnTeam(x):
         outputTeam = 28
     elif inputTeam == 'Huddersfield' or inputTeam == 'Huddersfield Town':
         outputTeam = 29
+    elif inputTeam == 'Wolverhampton Wanderers':
+        outputTeam = 30
+    elif inputTeam == 'Sheffield United':
+        outputTeam = 31
     else:
         outputTeam = 99
     return outputTeam
@@ -176,7 +180,8 @@ def returnTeam(x):
 newsUpdate = injurySoup.find("table", class_="ffs-ib respond ffs-ib-full-content ffs-ib-sort")
 newsRows = newsUpdate.find_all("tr")
 
-for i in newsRows:
+for i in newsRows[1:]:
+    # print (i)
     newsDetail = i.find_all("td")
     playerImage = i.find("img")
     playerImageID = ''
@@ -197,6 +202,7 @@ for i in newsRows:
 
         if counter == 0:
             playerName = i.get_text()
+            # print (playerName)
             playerName = playerName.strip()
             hasFirstName = playerName.find("(")
             if hasFirstName != -1:
@@ -206,6 +212,7 @@ for i in newsRows:
                 playerName = playerName.strip()
             else:
                 playerFirstName = ''
+            # print ('Player Name',playerFirstName, '+', playerName)
         if counter == 1:
             playerTeam = i["title"]
             playerTeam = returnTeam(playerTeam)
@@ -222,6 +229,7 @@ for i in newsRows:
             playerNews = re.sub('   ', '', playerNews.lstrip())
             playerNews = re.sub('\[Source]$', '', playerNews)
             newsURL = i.find("a")
+            # print(playerNews)
             if newsURL != None:
                 newsURL = newsURL["href"]
             else:
@@ -244,29 +252,40 @@ for i in newsRows:
             downloadImage(playerImage, imgFileName)
     else:
         playerImageID = "blank.jpg"
-    print(playerFirstName, playerName, playerTeam, playerStatus, returnDate, playerNews, newsURL, newsUpdated,
-          updateTS(), '1', seasonID, playerImageID)
+    # print(playerFirstName, playerName, playerTeam, playerStatus, returnDate, playerNews, newsURL, newsUpdated, updateTS(), '1', seasonID, playerImageID)
 
     # Determine if record exists. If it does insert into Table
     cursor = cnx.cursor()
-    cursor.execute(
-        "SELECT player_firstname, player_name, player_team, player_news_status FROM stg_player_news WHERE player_firstname = %s AND player_name = %s AND player_team = %s ",
-        (playerFirstName, playerName, playerTeam))
+    print (playerFirstName, playerName)
+
+    cursor.execute("SELECT player_firstname, player_name, player_team, player_news_status, seasonID FROM stg_player_news " \
+                   "WHERE player_firstname = %s AND player_name = %s AND player_team = %s AND seasonID = %s",
+                   (playerFirstName, playerName, playerTeam, seasonID))
     results = cursor.fetchone()
+    print (results)
+    print('Results:', playerFirstName, playerName, playerTeam, seasonID,newsUpdated)
+
+
 
     if results == None:
-        cursor.execute(
-            "INSERT INTO stg_player_news (player_firstname, player_name, player_team, player_status, player_returndate, player_news, player_newsURL, player_updateddate, player_rowadded, player_news_status, seasonID, player_imgID) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (playerFirstName, playerName, playerTeam, playerStatus, returnDate, playerNews, newsURL, newsUpdated,
-             updateTS(), '1', seasonID, playerImageID))
-        cnx.commit()
-        print('Row added for %s and he is %s .' % (playerName, playerStatus))
+        # print ((playerFirstName, playerName, playerTeam, playerStatus, returnDate, playerNews, newsURL, newsUpdated, updateTS(), '1', seasonID, playerImageID))
+        try:
+            cursor.execute(
+                "INSERT INTO stg_player_news (player_firstname, player_name, player_team, player_status, player_returndate, "
+                "player_news, player_newsURL, player_updateddate, player_rowadded, player_news_status, seasonID, player_imgID) "
+                "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (playerFirstName, playerName, playerTeam, playerStatus, returnDate, playerNews, newsURL, newsUpdated, updateTS(), '1', seasonID, playerImageID))
+            cnx.commit()
+            print('Row added for %s and he is %s .' % (playerName, playerStatus))
+        except Exception as e:
+            print ('Row failed to insert for %s and he is %s .' % (playerName, playerStatus))
+            cnx.rollback()
     else:
         cursor.execute("UPDATE stg_player_news SET player_news_status = 1, player_rowadded = %s "
-                       "WHERE player_firstname = %s AND player_name = %s AND player_team = %s ", (updateTS(), playerFirstName, playerName, playerTeam))
+                       "WHERE player_firstname = %s AND player_name = %s AND player_team = %s AND seasonID = %s",
+                       (updateTS(), playerFirstName, playerName, playerTeam, seasonID))
         cnx.commit()
         print('Row exists for %s and he is %s.' % (playerName, playerStatus))
-
         # print (counter)
     print(hr)
     # for i in newsDetail:

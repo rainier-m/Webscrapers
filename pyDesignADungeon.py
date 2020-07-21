@@ -98,8 +98,6 @@ def numEvents (num, die):
     result = diceRoll(num, die)
     return result
 
-
-
 def primordialEvent ():
     event = []
     getEvents = numEvents(2,8)
@@ -122,4 +120,5 @@ def primordialEvent ():
     return event
 
 events = primordialEvent()
-print (events)
+print ('Events:',events)
+print (mapArray)

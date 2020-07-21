@@ -44,7 +44,7 @@ subType = ['Bourbon Ridge Ham', 'Turkey', 'Ultimate', 'Italian', 'Chicken Tender
           'Ham', 'Deluxe', 'Philly Cheese', 'American', 'Rueben - Corned Beef', 'Maple Honey Turkey', 'EverRoast', 'Jerk Turkey',
           'Veggie', 'Tuna Salad', 'Egg Salad', 'Cuban Sub', 'Mojo Pork', 'Ham & Turkey', 'Chicken Salad', 'Beef Meatball']
 bread = ['Italian 5 Grain', 'White', 'Whole Wheat', 'Flatbread', 'Rye', 'Cuban Bread', 'Ciabatta', 'Salad']
-cheese = ['Cheddar', 'Muenster', 'Provolone', 'Swiss', 'White American', 'Yellow American', 'Gouda','No Cheese']
+cheese = ['Cheddar Cheese', 'Muenster Cheese', 'Provolone Cheese', 'Swiss', 'White American', 'Yellow American', 'Gouda','No Cheese']
 extras = ['Double Meats', 'Double Cheese', 'Bacon', 'Guacamole', 'Hummus', 'Black Bean Hummus']
 toppings = ['Banana Peppers', 'Black Olives', 'Garlic Pickles', 'Cucumber', 'Dill Pickles', 'Green Peppers', 'Jalapeno Peppers',
            'Lettuce', 'Onions', 'Spinach', 'Tomato', 'Salt', 'Black Pepper', 'Oregano', 'Oil', 'Vinegar', 'Sauerkraut']
