@@ -120,10 +120,13 @@ if (os.path.isfile(rhFilePathName) == True) and (tarfile.is_tarfile(rhFilePathNa
     today = datetime.datetime.today()
     modified_date = datetime.datetime.fromtimestamp(os.path.getmtime(rhFilePathName))
     fileDateCheck = today - modified_date
-    if fileDateCheck.days > 14:
+    print ("File Date Check:", fileDateCheck.days)
+
+    if fileDateCheck.days >= 0:
         print ("File is older than a day! Getting new Sentiment File.")
         downloadFile(RH_zipfileURL, rhFileName)
         print("New Sentiment File downloaded:", rhFilePathName)
+        # exit()
 
         rh_tarfile = tarfile.open(rhFilePathName)
         for i in rh_tarfile.getnames()[1:]:
@@ -156,7 +159,7 @@ results = cursor.fetchall()
 tickers = results
 print("The amount of stocks chosen to observe: " + str(len(tickers)))
 
-searchStocks = 5 # len(tickers)
+searchStocks = len(tickers)
 maxAPIcalls = 16000
 
 while (iter < searchStocks) and (API_Calls < maxAPIcalls):
@@ -172,7 +175,7 @@ while (iter < searchStocks) and (API_Calls < maxAPIcalls):
 
     # Find and remove files without a Ticker Response
 
-    if (os.path.isfile(globalPath + dataPath + stock +".csv") == True) and (fileDateCheck.days > 5):
+    if (os.path.isfile(globalPath + dataPath + stock +".csv") == True) and (fileDateCheck.days > 0):
         print ("File Older than One Day")
         try:
             # stock = tickers[iter][0]
@@ -244,8 +247,8 @@ while interval < len(list_files):
     Spread = 0 # Sets the initial Daily Spread to zero
     plus_minus = 1 # Identifies Up or Down Tick
     count = 0
-    while (count < 20):  # 10 because we are looking at the last 10 trading days
-        print(Data.iloc[count, 1], Data.iloc[count, 2], Data.iloc[count, 3])
+    while (count <= 10):  # 10 because we are looking at the last 10 trading days
+        # print(Data.iloc[count, 1], Data.iloc[count, 2], Data.iloc[count, 3])
         if Data.iloc[count, 1] < Data.iloc[count, 4]:  # True if the stock increased in price
             pos_move.append(count)  # Add the day to the pos_move list
         elif Data.iloc[count, 1] > Data.iloc[count, 4]:  # True if the stock decreased in price
