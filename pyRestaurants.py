@@ -13,6 +13,8 @@ A simple Python Program to parse out Florida Restaurants and Inspections.
     2022-10-18       RWM        Initial Stub and Layout
     2022-10-28       RWM        Working Prototype to take active restaurant licenses and
                                 inspections and save to MySQL
+    2024-02-22       RWM        Refactor for new dev on Toolbox server
+    2024-02-25       RWM        Refactor to have two functions for Restaurants & Inspections
 '''
 import os
 
@@ -20,9 +22,6 @@ version = '0.01.a'
 # Import Libraries needed for Scraping the various web pages
 import datetime
 import csv
-import bs4
-import requests
-import pprint
 import sys
 import codecs
 import mysql.connector
@@ -43,7 +42,7 @@ sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
 
 # Establish MySQL Connection
 cnx = mysql.connector.connect(user='root', password='password',
-                              host='localhost',
+                              host='dewalt',
                               database='restaurants',
                               auth_plugin='mysql_native_password')
 
@@ -52,10 +51,12 @@ hr = " >>> *** =================================================================
 shr = " >>> *** ==================== *** <<<"
 
 # Base Path for Output
-localPath = 'E:\\OneDrive - Mrga, Inc\\Restaurants_Florida\\'
+localPath = 'D:\\OneDrive - Mdga, Inc\\Restaurants_Florida\\'
 
-restaurantFile = 'hrfood1.csv'
-inspectionFile = '1fdinspi.csv'
+fileNumber = '1'
+
+restaurantFile = 'hrfood'+ fileNumber + '.csv'
+inspectionFile = fileNumber + 'fdinspi.csv'
 
 # Change Base Path to localPath
 os.chdir(localPath)
@@ -63,13 +64,22 @@ print (os.getcwd())
 
 openFile = open(restaurantFile, encoding="utf8")
 readRestaurant = csv.reader(openFile)
+next(readRestaurant)
 # restaurantData = list(readRestaurant)
 count = 1
+runDate = updateTS()
+
+def count_rows_in_csv(file_path):
+    with open(file_path, mode='r', encoding="utf8") as file:
+        reader = csv.reader(file)
+        row_count = sum(1 for row in reader)  # Count rows
+    return row_count
+
+rowsRestaurant = count_rows_in_csv(restaurantFile)
 
 for i in readRestaurant:
-    break
     # Parse out Row to data fields
-    licenceNumber = i[26]
+    licenceNumber = i[27]
     if len(licenceNumber) > 6:
         shortLicense = licenceNumber[-7:]
     else:
@@ -77,22 +87,32 @@ for i in readRestaurant:
     boardCode = i[1]
     licenseName = i[2][:90]
     locationName = i[14][:90]
+    if locationName == '':
+        locationName = licenseName
     locationAddr1 = i[16]
     locationCity = i[19]
     locationZip = i[21]
     locationCountyCd = i[22]
     licenseType = i[1]
     rankCode = i[3]
-    numberSeats = i[31]
-    if i[29] == '':
-        expireDate = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    else:
-        expireDate = datetime.datetime.strptime(i[29],'%m/%d/%Y')
+    numberSeats = i[32]
+    district = i[25]
+    if district == '':
+        district = fileNumber
+    # print (district)
+    # print (i[30])
+
     if i[30] != '':
-        lastInspection = datetime.datetime.strptime(i[30],'%m/%d/%Y')
+        expireDate = datetime.datetime.strptime(i[30],'%m/%d/%Y')
+    if i[31] != '':
+        lastInspection = datetime.datetime.strptime(i[31],'%m/%d/%Y')
     else:
         lastInspection = ''
-    print (shortLicense, licenceNumber, rankCode, licenseType, locationName, locationAddr1, locationCity, locationCountyCd, licenseName, numberSeats,  expireDate, lastInspection)
+    # print(expireDate)
+
+    if i[32] == '':
+        numberSeats = 0
+    # print (shortLicense, licenceNumber, rankCode, licenseType, locationName, locationAddr1, locationCity, locationCountyCd, licenseName, numberSeats,  expireDate, lastInspection, district)
     # print (hr)
 
     # SQL Inserts and Updates
@@ -106,142 +126,38 @@ for i in readRestaurant:
     if results == None:
         #insert
         # print('Try to add row for %s and the Restaurant Name is %s .' % (licenceNumber, locationName))
+        # print (numberSeats)
         try:
             cursor.execute(
-                "INSERT INTO restaurants (LicenseNumber, shortLicenseNumber, ApplicationType, BoardCode, RankCode, LicenseeName, LocationName, LocationAddr1,"
-                "LocationCity, LocationZipCode, LocationCountyCd, LicenseExpiry, NumberSeats) "
-                "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (licenceNumber, shortLicense, licenseType, boardCode, rankCode, licenseName, locationName, locationAddr1, locationCity, locationZip,
-                 locationCountyCd, expireDate, numberSeats))
+                "INSERT INTO restaurants (LicenseNumber, shortLicenseNumber, ApplicationType, BoardCode, RankCode, LicenseeName, LocationName, LocationAddr1,LocationCity, LocationZipCode, LocationCountyCd, LicenseExpiry, NumberSeats, runDate, district) "
+                "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (licenceNumber, shortLicense, licenseType, boardCode, rankCode, licenseName, locationName, locationAddr1, locationCity, locationZip,locationCountyCd, expireDate, numberSeats, runDate,district))
             cnx.commit()
-            # print('Row added for %s and the Restaurant Name is %s .' % (licenceNumber, locationName))
+            print('Row added for %s and the Restaurant Name is %s .' % (licenceNumber, locationName))
         except Exception as e:
-            print('Row failed to insert for %s and he is %s .' % (licenceNumber, locationName))
+            print('Row failed to insert for %s and he is %s .' % (licenceNumber, locationName), e)
+            cursor.execute("INSERT INTO parselog (runDate, logREsult) values (%s, %s)" % (runDate, e))
+            cnx.commit()
             cnx.rollback()
 
     else:
         print('Row exists for %s and the Restaurant Name is %s.' % (licenceNumber, locationName))
         #
         cursor.execute("UPDATE restaurants SET LicenseeName = %s, LocationName = %s, LocationAddr1 = %s, LocationCity = %s, "
-                       "LocationZipCode = %s, LocationCountyCd = %s, LicenseExpiry = %s, NumberSeats = %s "
+                       "LocationZipCode = %s, LocationCountyCd = %s, LicenseExpiry = %s, NumberSeats = %s , runDate = %s, district = %s, runDate =%s, inspectionAdd =%s" 
                        "WHERE LicenseNumber = %s AND LicenseExpiry = %s", (licenseName, locationName, locationAddr1,
-                       locationCity, locationZip, locationCountyCd, expireDate, numberSeats, licenceNumber, expireDate))
+                       locationCity, locationZip, locationCountyCd, expireDate, numberSeats, runDate, district, runDate, "0", licenceNumber, expireDate))
 
         cnx.commit()
         #
+
+    # print ("Row", str(count), "of", str(rowsRestaurant), "Processed")
+    percentComplete = count / (rowsRestaurant - 1)
+    print("Processed:", "{:.3%}".format(percentComplete), "of Restaurants")
     count += 1
-
-openFile = open(inspectionFile, encoding="utf8")
-readInspections = csv.reader(openFile)
-# restaurantData = list(readRestaurant)
-count = 1
-
-
-
-# Iterate through inspections file
-for i in readInspections:
-    # print (i)
-    inspectionNumber = i[9]
-    licenseNumber = i[4]
-    inspectionDate = datetime.datetime.strptime(i[14],'%m/%d/%Y')
-    inspectionType = i[12]
-    inspectionDisposition = i[13]
-    totalViolations = i[17]
-    violationHighPriority = i[18]
-    violationIntermediate = i[19]
-    violationBasic = i[20]
-    boardCode = i[3]
-    licenseName = i[5][:90]
-    locationName = i[5][:90]
-    locationAddr1 = i[6]
-    locationCity = i[7]
-    locationZip = i[8]
-    locationCountyCd = i[1]
-    expireDate = datetime.datetime.strptime(i[14], '%m/%d/%Y')
-    inspectionID = i[80]
-    visitID = i[81]
-    visitNumber = i[10]
-    if i[30] != '':
-        lastInspection = datetime.datetime.strptime(i[14], '%m/%d/%Y')
-    else:
-        lastInspection = ''
-    if totalViolations == '':
-        totalViolations = 0
-    if violationHighPriority == '':
-        violationHighPriority = 0
-    if violationIntermediate == '':
-        violationIntermediate = 0
-    if violationBasic == '':
-        violationBasic = 0
-
-    # print (inspectionNumber, locationName, licenseNumber, inspectionDate, inspectionType, totalViolations, inspectionID, visitID)
-    print (inspectionID, visitID, restaurantFile)
-#
-    # SQL Inserts and Updates
-    cursor = cnx.cursor(buffered=True, dictionary=True)
-    cursor.execute(
-        "SELECT inspectionNumber, inspectionDate FROM inspections WHERE inspectionNumber = %s AND inspectionDate = %s ",
-        (inspectionNumber, inspectionDate))
-    results = cursor.fetchone()
-
-    cursor.execute("SELECT shortLicenseNumber from restaurants WHERE shortLicenseNumber = %s" % licenseNumber)
-    restaurantExists = cursor.fetchone()
-
-    if restaurantExists == None:
-        print ('Adding restaurant', licenseNumber, locationName, restaurantFile)
-        try:
-            cursor.execute("INSERT INTO restaurants (licenseNumber, shortLicenseNumber, locationName, locationAddr1, locationCity, "
-                           "locationCountyCd, LicenseExpiry, LastInspeciton, boardCode, applicationType, licenseeName) "
-                       "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                           (licenseNumber, licenseNumber, locationName, locationAddr1, locationCity, locationCountyCd, expireDate,
-                            lastInspection, boardCode, boardCode, locationName))
-            cnx.commit()
-        except Exception as e:
-            print ('Unable to add row for Restaurant %s' % (locationName))
-    else:
-
-        cursor.execute ("UPDATE inspections SET inspectionID = %s, visitNumber = %s, visitID = %s "
-                        "WHERE inspectionNumber = %s AND inspectionDate = %s",
-                        (inspectionID, visitNumber, inspectionNumber, visitID, inspectionDate))
-        # print ('Updated Inspection for %s' % locationName)
-        cnx.commit()
-
-    if results == None:
-        # insert
-        # print('Try to add row for %s and the Restaurant Name is %s .' % (licenseNumber, inspectionNumber))
-
-        # try:
-        cursor.execute("INSERT INTO inspections (inspectionNumber, LicenseNumber, inspectionDate, inspectionType, inspectionDisposition,"
-            "totalViolations, violationHighPriority, violationIntermediate, violationBasic, visitID, inspectionID, visitNumber) "
-            "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (inspectionNumber, licenseNumber, inspectionDate, inspectionType, inspectionDisposition, totalViolations,
-             violationHighPriority, violationIntermediate, violationBasic, visitID, inspectionID, visitNumber))
-        cnx.commit()
-            # print('Row added for %s and the Inspection # is %s .' % (licenseNumber, inspectionNumber))
-        # except Exception as e:
-            # print('Row failed to insert for %s and the Inspeciton # is %s .' % (licenseNumber, inspectionNumber))
-            # cnx.rollback()
-
-    else:
-        # print('Row exists for %s and the Inspection # is %s.' % (licenseNumber, inspectionNumber))
-        cursor.execute("UPDATE inspections SET inspectionID = %s, visitNumber = %s, visitID = %s "
-                       "WHERE inspectionNumber = %s AND inspectionDate = %s and visitNumber = %s",
-                       (inspectionID, visitNumber, inspectionNumber, visitID, inspectionDate, visitNumber))
-        print ('Updated Inspection for %s' % locationName)
-        cnx.commit()
-
-        '''
-        cursor.execute("UPDATE stg_player_news SET player_news_status = 1, player_rowadded = %s "
-                       "WHERE player_firstname = %s AND player_name = %s AND player_team = %s AND seasonID = %s",
-                       (updateTS(), playerFirstName, playerName, playerTeam, seasonID))
-        cnx.commit()
-        '''
-    count += 1
-
-
-    # print (hr)
 
 # Commit and Close the Database Connection.
 cnx.commit()
 cnx.close()
 print('MySQL Connection Closed')
+

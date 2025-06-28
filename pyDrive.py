@@ -20,7 +20,7 @@ import sys
 import codecs
 import pandas as pd
 import math
-from PyPDF2 import PdfReader
+# from PyPDF2 import PdfReader
 
 
 # Provide Google Drive Physical Location
