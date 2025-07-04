@@ -20,6 +20,7 @@ A simple Python Program to scrape the ESPN FC website for content.
     2016-10Oct-06    RWM        Cleaned up the Dates for updateDate, and returnDate
     2020-09Sep-08    RWM        Updated for 2020/21 Season
 '''
+
 # Import Libraries needed for Scraping the various web pages
 import bs4
 import re
@@ -33,25 +34,21 @@ import mysql.connector
 # Set Character Output
 print('System Encoding:', sys.stdout.encoding)
 sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
-
-
 # Establish MySQL Connection
-cnx = mysql.connector.connect(user='user', password='password',
-                              host='mjolnir',
+cnx = mysql.connector.connect(user='root', password='password',
+                              host='127.0.0.1',
                               database='fanfootball',
-                              auth_plugin='mysql_native_password')
+                              use_pure=False)
 
 # Establish the process Date & Time Stamp
 ts = datetime.datetime.now().strftime("%H:%M:%S")
 ds = datetime.datetime.now().strftime("%Y-%m-%d")
 date = datetime.datetime.now().strftime("%Y%m%d")
 
-
 # Updates the Time Stamp
 def updateTS():
     update = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return update
-
 
 # Download Image
 def downloadImage(imageURL, localFileName):
@@ -62,7 +59,6 @@ def downloadImage(imageURL, localFileName):
         for chunk in response.iter_content(4096):
             fo.write(chunk)
     return True
-
 
 hr = " >>> *** ======================================================================= *** <<<"
 shr = " >>> *** ==================== *** <<<"
@@ -81,6 +77,10 @@ seasonID = 5
 # Base Path for Output
 localPath = 'F:\\ESPN-Parser\\'
 localimgPath = 'F:\\ESPN-Parser\\img\\players\\'
+
+# Base Path for Output
+localPath = 'D:\\ESPN-Parser\\'
+localimgPath = 'D:\\ESPN-Parser\\img\\players\\'
 # baseWkBk = 'stats_template.xlsx'
 # workBook = openpyxl.load_workbook(os.path.join(localPath + baseWkBk))
 # teamSheet = workBook.get_sheet_by_name('teams')
@@ -94,10 +94,9 @@ print (os.getcwd())
 injuryRes = requests.get(injuriesURL)
 injuryRes.raise_for_status()
 injurySoup = bs4.BeautifulSoup(injuryRes.text, "html.parser")
-#with open(os.path.join(localPath + ds + '-injuryLanding.txt'), 'wb') as fo:
-#    for chunk in injuryRes.iter_content(100000):
-#        fo.write(chunk)
-
+with open(os.path.join(localPath + ds + '-injuryLanding.txt'), 'wb') as fo:
+    for chunk in injuryRes.iter_content(100000):
+        fo.write(chunk)
 
 # Output Injury HTML Page.
 # print (injurySoup.prettify())
@@ -112,7 +111,6 @@ def downloadImage(imageURL, localFileName):
         for chunk in response.iter_content(4096):
             fo.write(chunk)
     return True
-
 
 # Will Need to Update with new season update and promotions / relegations...
 # Current as of 2017/18
@@ -241,7 +239,6 @@ for i in newsRows[1:]:
             # print (newsUpdated)
 
         counter += 1
-
     if playerImage is not None:
         playerImage = playerImage["src"]
         imgFileName = playerImage[playerImage.rfind('/') + 1:]
@@ -271,8 +268,6 @@ for i in newsRows[1:]:
     # print (results)
     print('Results:', (playerFirstName, playerName, playerTeam, playerStatus, returnDate, playerNews, newsURL, newsUpdated, updateTS(), '1', seasonID, playerImageID))
 
-
-
     if results == None:
         # print ((playerFirstName, playerName, playerTeam, playerStatus, returnDate, playerNews, newsURL, newsUpdated, updateTS(), '1', seasonID, playerImageID))
         try:
@@ -291,6 +286,27 @@ for i in newsRows[1:]:
                        "WHERE player_firstname = %s AND player_name = %s AND player_team = %s AND seasonID = %s",
                        (updateTS(), playerFirstName, playerName, playerTeam, seasonID))
         cnx.commit()
+        print('Row exists for %s and he is %s.' % (playerName, playerStatus))
+    else:
+        playerImageID = "blank.jpg"
+    print(playerFirstName, playerName, playerTeam, playerStatus, returnDate, playerNews, newsURL, newsUpdated,
+          updateTS(), '1', seasonID, playerImageID)
+
+    # Determine if record exists. If it does insert into Table
+    cursor = cnx.cursor()
+    cursor.execute(
+        "SELECT player_firstname, player_name, player_team, player_news_status FROM stg_player_news WHERE player_firstname = %s AND player_name = %s AND player_team = %s ",
+        (playerFirstName, playerName, playerTeam))
+    results = cursor.fetchone()
+
+    if results == None:
+        cursor.execute(
+            "INSERT INTO stg_player_news (player_firstname, player_name, player_team, player_status, player_returndate, player_news, player_newsURL, player_updatedate, player_rowadded, player_news_status, seasonID, player_imgID) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (playerFirstName, playerName, playerTeam, playerStatus, returnDate, playerNews, newsURL, newsUpdated,
+             updateTS(), '1', seasonID, playerImageID))
+        cnx.commit()
+        print('Row added for %s and he is %s .' % (playerName, playerStatus))
+    else:
         print('Row exists for %s and he is %s.' % (playerName, playerStatus))
         # print (counter)
     print(hr)

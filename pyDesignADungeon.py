@@ -122,3 +122,4 @@ def primordialEvent ():
 events = primordialEvent()
 print ('Events:',events)
 print (mapArray)
+print (events)

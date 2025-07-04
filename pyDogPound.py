@@ -24,7 +24,7 @@ import os
 import sys
 import codecs
 import mysql.connector
-#from PIL import Image
+from PIL import Image
 import time
 
 # Set Character Output
@@ -69,8 +69,7 @@ baseURL = 'http://petharbor.com/'
 
 # Base Path for Output
 localPath = 'D:\\DogPound\\'
-# localimgPath = 'D:\\DogPound\\img\\'
-localimgPath = 'D:\\xampp\\htdocs\\furever\\img\\pets\\'
+localimgPath = 'D:\\DogPound\\img\\'
 
 # Download Images from a passed image URL, give a local filename + extension
 def downloadImage(imageURL, localFileName):
@@ -148,8 +147,6 @@ def parsePetRow (x, y):
                   'Brussels Griffon', 'Shetland Sheepdog', 'Alaskan Malamute', 'Corgi', 'Welsh Corgi    ', 'Cane Corso', 'Vizsla', 'Dutch Sheepdog',
                   'Hound', 'Bernese Mountain Dog', 'English Foxhound', 'American Shorthair', 'Russian Blue','Maine Coon','Great Dane',
                   'Bloodhound','Dalmatian','Rhodesian Ridgeback','Great Dane','Sheepdog']
-
-
     foundBreeds = []
     countBreed = 0
     for i in listBreeds:
@@ -166,6 +163,11 @@ def parsePetRow (x, y):
                             r"((Boxer)|(American Bulldog)|(Bulldog)|(Mastiff)|(Presa Canario)|(Australian Kelpie)|(Flat Coated Retriever))|"
                             r"((Beagle)|(Golden Retriever)|(Labrador Retriever)|(Coonhound)|(German Shepherd)|(Australian Shepherd)|"
                             r" (Plott Hound)|(Rottweiler)|(Pointer)|(English Shepherd)|(Tosa)|(Chinese Sharpei)|(Bombay)|(Chow Chow))|"
+    breedRegex = re.compile(r"((mix)|"
+                            r"(((Maltese)|(Miniature Pinscher)|(Chihuahua)|(Poodle)|(Shih Tzu)|(Dachshund)|(Weimaraner)|(Alaskan Husky))|"
+                            r"((Boxer)|(American Bulldog)|(Bulldog)|(Mastiff)|(Presa Canario)|(Australian Kelpie)|(Flat Coated Retriever))|"
+                            r"((Beagle)|(Golden Retriever)|(Labrador Retriever)|(German Shepherd)|(Australian Shepherd)|"
+                            r" (Plott Hound)|(Rottweiler)|(Pointer)|(English Shepherd)|(Tosa)|(Chinese Sharpei)|(Chow Chow))|"
                             r"((Welsh Springer Spaniel)|(Terrier)|(Schnauzer)|(Cocker Spaniel)|(Spaniel)|(Siberian Husky)|(Shiba Inu))|"
                             r" (Dogo Argentino)|(Yorkshire Terrier)|(Pitt Bull Terrier)|(English Bulldog)|(Boston Terrier)"
                             r" (Dutch Sheepdog)|(Bull Terrier)|(Newfoundland)|(Black Mouth Cur)|(Brasileiro)|(Belgian Malinois)|"
@@ -179,6 +181,9 @@ def parsePetRow (x, y):
                             r"(English Foxhound)|(American Shorthair)|(Russian Blue)))")
     breedRegex1 = re.compile(r"((Maine Coon)|(Great Dane)|(Bloodhound)|(Dalmatian)|(Rhodesian Ridgeback)|(Great Dane)|(Sheepdog))")
     breedType = breedRegex0.search(breed)
+                            r" (Jack Russell Terrier))|"
+                            r"((Domestic Shorthair)|(Domestic Mediumhair)|(Siamese)|(Domestic Longhair)))")
+    breedType = breedRegex.search(breed)
     breedDesc = "Unknown"
     mixRegex = re.compile(r"(mix)")
     mixSearch = mixRegex.search(breed)
@@ -384,8 +389,6 @@ def parsePetRow (x, y):
             foundBreeds.remove('Terrier')
         elif i == 'Cairn Terrier':
             foundBreeds.remove('Terrier')
-
-
 
     for i in foundBreeds:
         toFind = i
