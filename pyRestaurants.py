@@ -53,7 +53,7 @@ shr = " >>> *** ==================== *** <<<"
 # Base Path for Output
 localPath = 'D:\\OneDrive - Mdga, Inc\\Restaurants_Florida\\'
 
-fileNumber = '4'
+fileNumber = '2'
 
 restaurantFile = 'hrfood'+ fileNumber + '.csv'
 inspectionFile = fileNumber + 'fdinspi.csv'
@@ -117,11 +117,10 @@ for i in readRestaurant:
 
     # SQL Inserts and Updates
     cursor = cnx.cursor(buffered=True, dictionary=True)
-    cursor.execute(
-        "SELECT LicenseNumber, LicenseExpiry FROM restaurants WHERE LicenseNumber = %s AND LicenseExpiry = %s ",
-        (licenceNumber, expireDate))
+    cursor.execute("SELECT LicenseNumber FROM restaurants WHERE LicenseNumber = %s", (licenceNumber,))
+
     results = cursor.fetchone()
-    # print (licenseName, expireDate, count)
+    print (licenseName, expireDate, count)
 
     if results == None:
         #insert
@@ -155,6 +154,8 @@ for i in readRestaurant:
     percentComplete = count / (rowsRestaurant - 1)
     print("Processed:", "{:.3%}".format(percentComplete), "of Restaurants")
     count += 1
+
+    # break
 
 # Commit and Close the Database Connection.
 cnx.commit()
