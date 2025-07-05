@@ -54,7 +54,7 @@ shr = " >>> *** ==================== *** <<<"
 # Base Path for Output
 localPath = 'D:\\OneDrive - Mdga, Inc\\Restaurants_Florida\\'
 
-fileNumber = '4'
+fileNumber = '1'
 
 # Create the File Name for the Restaurants & Inspections
 # restaurantFile = 'hrfood'+ fileNumber + '.csv'
@@ -139,7 +139,7 @@ for i in readInspections:
         print ('Adding restaurant', licenseNumber, locationName, inspectionFile)
         inspectionAdd = 1
         try:
-            cursor.execute("INSERT INTO restaurants (licenseNumber, shortLicenseNumber, locationName, locationAddr1, locationCity, "
+            cursor.execute("INSERT INTO temp_restaurants (licenseNumber, shortLicenseNumber, locationName, locationAddr1, locationCity, "
                            "locationCountyCd, runDate, district, inspectionAdd) "
                        "values (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                            (licenseNumber, licenseNumber, locationName, locationAddr1, locationCity, locationCountyCd, runDate, district, inspectionAdd))

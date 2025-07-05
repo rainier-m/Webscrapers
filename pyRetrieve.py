@@ -1,9 +1,9 @@
 #!python3
 # -*- coding: utf-8 -*-
 '''
-Created on  2017-12Dec-01
-Modified on 2020-01Jan-21
-Version 0.01.a
+Created on  2025-06Jun-14
+Modified on 2025-06Jun-29
+Version 0.5.a
 @author: rainier.madruga@gmail.com
 A simple Python Program to retrieve Florida Inspections and Restaurant License Files.
 ### =========================================================================================== ###
@@ -11,10 +11,10 @@ A simple Python Program to retrieve Florida Inspections and Restaurant License F
 ### Date             Dev        Change Description                                              ###
 ### =========================================================================================== ###
     2025-06-14       RWM        Initial Stub and Layout
-
+    2025-06-29       RWM        Added Download Series Function & URL of Main File Location
 '''
 
-version = '0.01.a'
+version = '0.5.a'
 # Import Libraries needed for Scraping the various web pages
 import datetime
 import csv
@@ -51,6 +51,7 @@ shr = " >>> *** ==================== *** <<<"
 
 # Base Path for Output
 localPath = 'D:\\OneDrive - Mdga, Inc\\Restaurants_Florida\\'
+locationOfFiles = 'https://www2.myfloridalicense.com/hotels-restaurants/public-records'
 
 def download_file_series(base_url, file_pattern, start_index, end_index, download_dir):
     """
