@@ -53,7 +53,7 @@ shr = " >>> *** ==================== *** <<<"
 # Base Path for Output
 localPath = 'D:\\OneDrive - Mdga, Inc\\Restaurants_Florida\\'
 
-fileNumber = '2'
+fileNumber = '4'
 
 restaurantFile = 'hrfood'+ fileNumber + '.csv'
 inspectionFile = fileNumber + 'fdinspi.csv'
@@ -120,7 +120,7 @@ for i in readRestaurant:
     cursor.execute("SELECT LicenseNumber FROM restaurants WHERE LicenseNumber = %s", (licenceNumber,))
 
     results = cursor.fetchone()
-    print (licenseName, expireDate, count)
+    print (licenseName, "|", expireDate, "|", count)
 
     if results == None:
         #insert
@@ -154,6 +154,7 @@ for i in readRestaurant:
     percentComplete = count / (rowsRestaurant - 1)
     print("Processed:", "{:.3%}".format(percentComplete), "of Restaurants")
     count += 1
+    print(shr)
 
     # break
 
